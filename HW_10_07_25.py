@@ -2,54 +2,31 @@ import sqlite3
 
 conn = sqlite3.connect('check.db') 
 cursor = conn.cursor()
+conn.row_factory = sqlite3.Row
 
-print('''SELECT passengers.*, taxis.driver_name, taxis.car_type
-FROM passengers
-JOIN taxis ON passengers.taxi_id = taxis.id;''')
+def join_type_func(requested_join):
+    cursor.execute(requested_join)
+    for row in cursor.fetchall():
+        print(dict(row))
 
-cursor.execute('''
-SELECT passengers.*, taxis.driver_name, taxis.car_type
-FROM passengers
-JOIN taxis ON passengers.taxi_id = taxis.id;
-''')
-for row in cursor.fetchall():
-    print(dict(row))
+inner_join = '''SELECT passengers.*, taxis.driver_name, taxis.car_type
+            FROM passengers JOIN taxis ON passengers.taxi_id = taxis.id;'''
 
+left_join ='''SELECT p.*, t.driver_name , t.car_type FROM passengers p  
+            LEFT join taxis t ON p.taxi_id = t.id'''
 
-print('''SELECT p.*, t.driver_name , t.car_type FROM passengers p  
-LEFT join taxis t ON p.taxi_id = t.id''')
+full_join = '''SELECT p.*, t.driver_name , t.car_type FROM passengers p  
+            LEFT join taxis t ON p.taxi_id = t.id WHERE p.taxi_id is NULL'''
 
-cursor.execute('''SELECT p.*, t.driver_name , t.car_type FROM passengers p  
-LEFT join taxis t ON p.taxi_id = t.id''')
-for row in cursor.fetchall():
-    print(dict(row))
-
-print('''SELECT p.*, t.driver_name , t.car_type FROM passengers p  
-LEFT join taxis t ON p.taxi_id = t.id WHERE p.taxi_id is NULL''')
-
-cursor.execute('''SELECT p.*, t.driver_name , t.car_type FROM passengers p  
-LEFT join taxis t ON p.taxi_id = t.id WHERE p.taxi_id is NULL''')
-for row in cursor.fetchall():
-    print(dict(row))
-
-print('''SELECT p.*, t.driver_name , t.car_type FROM passengers p  
-FULL join taxis t ON p.taxi_id = t.id''')
-
-cursor.execute('''SELECT p.*, t.driver_name , t.car_type FROM passengers p  
-FULL join taxis t ON p.taxi_id = t.id''')
-for row in cursor.fetchall():
-    print(dict(row))
+cross_join = '''SELECT p.*, t.driver_name, t.car_type FROM passengers p  
+            LEFT JOIN taxis t ON p.taxi_id = t.id WHERE t.id IS NULL'''
 
 
-print('''SELECT p.*, t.driver_name , t.car_type FROM passengers p  
-CROSS join taxis t ''')
+joins = [inner_join, left_join, full_join, cross_join]
 
-cursor.execute('''SELECT p.*, t.driver_name , t.car_type FROM passengers p  
-CROSS join taxis t ''')
-for row in cursor.fetchall():
-    print(dict(row))
-
-
+for join in joins:
+    print(join)
+    join_type_func(join)
 
 
 conn.close()
