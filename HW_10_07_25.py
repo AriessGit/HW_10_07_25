@@ -25,7 +25,7 @@ cross_join = '''SELECT p.*, t.driver_name, t.car_type FROM passengers p
 joins = [inner_join, left_join, full_join, cross_join]
 
 for join in joins:
-    print(join)
+    print('\n',join)
     join_type_func(join)
 
 
